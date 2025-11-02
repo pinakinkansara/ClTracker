@@ -197,11 +197,12 @@
 
             repaymentList.forEach((p, index) => {
                 
-                // FIX: This section ensures the YYYY-MM-DD string is displayed correctly
-                // by constructing a Date object based on UTC values, preventing local timezone shift.
+                // FIX: Using the Date(year, monthIndex, day) constructor creates a Date object
+                // representing midnight on that date in the local timezone, preventing the
+                // UTC-to-local-time shift that caused the "yesterday" bug.
                 const dateParts = p.date.split('-'); // [YYYY, MM, DD]
-                // Month in Date.UTC is 0-indexed, so we subtract 1 from the month part
-                const displayDate = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2]));
+                // Arguments: Year, Month (0-indexed!), Day
+                const displayDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
                 
                 const row = `
                     <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition duration-100">
