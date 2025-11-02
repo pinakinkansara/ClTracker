@@ -144,6 +144,16 @@
             }).format(amount);
         };
         
+        // ** NEW UTILITY FUNCTION **
+        /** Returns the current local date formatted as YYYY-MM-DD string, avoiding UTC-based shifts. */
+        const getLocalDateString = (date = new Date()) => {
+            const year = date.getFullYear();
+            // getMonth() is 0-indexed, so we add 1
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
         // --- Message Box Handling ---
         window.showMsg = (type, message) => {
             const msgBox = document.getElementById('message-box');
@@ -197,9 +207,7 @@
 
             repaymentList.forEach((p, index) => {
                 
-                // FIX: Using the Date(year, monthIndex, day) constructor creates a Date object
-                // representing midnight on that date in the local timezone, preventing the
-                // UTC-to-local-time shift that caused the "yesterday" bug.
+                // This logic is correct for displaying the stored YYYY-MM-DD string as a date.
                 const dateParts = p.date.split('-'); // [YYYY, MM, DD]
                 // Arguments: Year, Month (0-indexed!), Day
                 const displayDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
@@ -297,7 +305,8 @@
                 renderRepayments(repayments);
                 
                 // Clear the form after successful submission
-                document.getElementById('repayment-date').value = new Date().toISOString().substring(0, 10);
+                // ** FIX APPLIED HERE ** using the new getLocalDateString utility
+                document.getElementById('repayment-date').value = getLocalDateString();
                 document.getElementById('repayment-amount').value = '';
 
                 showMsg('success', 'Repayment recorded successfully!');
@@ -338,7 +347,8 @@
         // --- Setup Default Date and Initial Load on DOMContentLoaded ---
         document.addEventListener('DOMContentLoaded', () => {
             // Set default date for repayment input to today
-            document.getElementById('repayment-date').value = new Date().toISOString().substring(0, 10);
+            // ** FIX APPLIED HERE ** using the new getLocalDateString utility
+            document.getElementById('repayment-date').value = getLocalDateString();
             
             // Load all data from localStorage immediately
             loadAndRenderData();
